@@ -1,3 +1,5 @@
+import { useEffect } from 'react';
+import Swal from 'sweetalert2';
 import { useAuthStore, useForm } from '../../hooks';
 import './LoginPage.css';
 
@@ -16,7 +18,7 @@ const registerFormFields = {
 
 export const LoginPage = () => {
 
-    const { startLogin } = useAuthStore();
+    const { startLogin, errorMessage, startRegister } = useAuthStore();
 
     const { loginEmail, loginPassword, onInputChange:onLoginInputChange,  } = useForm( loginFormFields )
 
@@ -25,14 +27,27 @@ export const LoginPage = () => {
 
     const loginInput = (event) => {
         event.preventDefault()
-        startLogin({email: loginEmail,password: loginPassword})
+        startLogin({email: loginEmail ,password: loginPassword})
     }
 
     const registerSubmit = (event) => {
         event.preventDefault()
-        
+        if ( registerPassword !== registerPassword2  ){
+            Swal.fire('Error en registro', 'Contraseñas no son iguales', 'error')
+            return
+        }
 
+        startRegister({name: registerName, email: registerEmail, password: registerPassword})
+        
     }
+
+    useEffect(() => {
+        if(errorMessage !== undefined){
+            Swal.fire('Error en la autenticacion', errorMessage, 'error' );
+        }
+
+    }, [errorMessage] )
+
 
     return (
         <div className="container login-container">
@@ -46,7 +61,7 @@ export const LoginPage = () => {
                                 className="form-control"
                                 placeholder="Correo"
                                 name="loginEmail"
-                                value={loginEmail}
+                                /* value={loginEmail} */
                                 onChange={onLoginInputChange}
                             />
                         </div>
@@ -56,7 +71,7 @@ export const LoginPage = () => {
                                 className="form-control"
                                 placeholder="Contraseña"
                                 name="loginPassword"
-                                value={loginPassword}
+                                /* value={loginPassword} */
                                 onChange={onLoginInputChange}
                             />
                         </div>
